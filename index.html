@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0f1117" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
+  <title>SvuotaCoda — Cattura, Contesto & Triage Veloce</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #181b23;
+      --surface-2: #222632;
+      --border: #2e3444;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --yt: #ef4444;
+      --ig: #ec4899;
+      --pin: #e11d48;
+      --web: #3b82f6;
+      --shot: #10b981;
+      --warn: #f59e0b;
+      --danger: #dc2626;
+      --success: #16a34a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 20px;
+    }
+
+    .brand h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand p {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button, .btn {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    button:hover, .btn:hover { border-color: var(--accent); }
+    button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    button.primary:hover { background: var(--accent-hover); }
+    button.success { background: rgba(22, 163, 74, 0.18); border-color: var(--success); color: #86efac; }
+    button.danger { background: rgba(220, 38, 38, 0.18); border-color: var(--danger); color: #fca5a5; }
+    button.warn { background: rgba(245, 158, 11, 0.18); border-color: var(--warn); color: #fcd34d; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      margin-bottom: 12px;
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .form-row-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .form-row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 10px;
+      }
+    }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    input[type="text"], input[type="url"], input[type="date"], select, textarea {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-family: inherit;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .alert-box {
+      display: none;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 0.86rem;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .alert-box.show { display: flex; }
+
+    .alert-dup {
+      background: rgba(245, 158, 11, 0.14);
+      border: 1px solid var(--warn);
+      color: #fde68a;
+    }
+
+    .alert-exp {
+      background: rgba(99, 102, 241, 0.14);
+      border: 1px solid var(--accent);
+      color: #e0e7ff;
+    }
+
+    .alert-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .expiry-preview {
+      font-size: 0.8rem;
+      color: var(--muted);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dropzone {
+      border: 1.5px dashed var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--accent);
+      background: rgba(99, 102, 241, 0.08);
+      color: var(--text);
+    }
+
+    .preview-box {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      background: var(--surface-2);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .preview-box img {
+      width: 56px;
+      height: 56px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+
+    .chip {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .chip.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .stats-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .item-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .badge.youtube { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    .badge.instagram { background: rgba(236, 72, 153, 0.2); color: #f9a8d4; }
+    .badge.pinterest { background: rgba(225, 29, 72, 0.2); color: #fda4af; }
+    .badge.web { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+    .badge.screenshot { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+    .badge.expiring { background: rgba(245, 158, 11, 0.22); color: #fcd34d; }
+    .badge.pinned { background: rgba(99, 102, 241, 0.25); color: #c7d2fe; }
+
+    .item-title {
+      font-size: 1.02rem;
+      font-weight: 600;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .item-channel {
+      font-size: 0.84rem;
+      color: #a5b4fc;
+      font-weight: 500;
+    }
+
+    .item-summary {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      background: var(--surface-2);
+      padding: 8px 10px;
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
+      white-space: pre-line;
+    }
+
+    .item-url {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .item-url:hover { text-decoration: underline; color: var(--text); }
+
+    .item-thumb {
+      max-width: 100%;
+      max-height: 220px;
+      border-radius: 8px;
+      object-fit: contain;
+      background: #000;
+      align-self: flex-start;
+    }
+
+    .item-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding-top: 6px;
+      border-top: 1px solid var(--border);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 36px 16px;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      max-width: 580px;
+      width: 100%;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--surface-2);
+      border: 1px solid var(--accent);
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      z-index: 200;
+    }
+
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <h1>📥 SvuotaCoda</h1>
+      <p>Salva con contesto, controlla scadenze e doppioni, fai pulizia veloce.</p>
+    </div>
+    <div class="header-actions">
+      <button class="primary" id="installAppBtn" style="display:none;">📲 Installa App</button>
+      <button class="primary" id="openTriageBtn">⚡ Triage Veloce</button>
+      <button id="exportBtn" title="Scarica backup locale in JSON">⬇️ Esporta .json</button>
+      <button id="importTriggerBtn" title="Ripristina o unisci un backup JSON">⬆️ Importa .json</button>
+      <input type="file" id="importFileInput" accept=".json,application/json" style="display:none" />
+    </div>
+  </header>
+
+  <!-- Form Cattura Rapida -->
+  <section class="card">
+    <h2>
+      <span>➕ Cattura Rapida</span>
+      <span id="metaStatus" style="font-size:0.78rem; color:var(--muted); font-weight:400;"></span>
+    </h2>
+    <form id="captureForm" class="form-grid">
+      <div class="form-row-2">
+        <div>
+          <label for="urlInput">Link</label>
+          <input type="url" id="urlInput" placeholder="Incolla link (YouTube, Reel, Pinterest, Web)..." />
+        </div>
+        <div>
+          <label for="titleInput">Titolo</label>
+          <input type="text" id="titleInput" placeholder="Titolo (es. Come ottimizzare il flusso...)" />
+        </div>
+      </div>
+
+      <div class="form-row-3">
+        <div>
+          <label for="channelInput">Canale / Autore</label>
+          <input type="text" id="channelInput" placeholder="Canale / Autore (es. Marco Montemagno)" />
+        </div>
+        <div>
+          <label for="sourceSelect">Fonte</label>
+          <select id="sourceSelect">
+            <option value="auto">Fonte: Rileva automatico</option>
+            <option value="youtube">YouTube</option>
+            <option value="instagram">Instagram / Reel</option>
+            <option value="pinterest">Pinterest</option>
+            <option value="screenshot">Screenshot</option>
+            <option value="web">Web / Altro</option>
+          </select>
+        </div>
+        <div>
+          <label for="expirySelect">Scadenza</label>
+          <select id="expirySelect" title="Scadenza automatica">
+            <option value="7">Scade tra 7 giorni</option>
+            <option value="3">Scade tra 3 giorni</option>
+            <option value="14">Scade tra 14 giorni</option>
+            <option value="30">Scade tra 30 giorni</option>
+            <option value="custom">Data specifica...</option>
+            <option value="0">Nessuna scadenza</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="customExpiryWrap" style="display:none;">
+        <label for="customExpiryDate">Scegli data di scadenza</label>
+        <input type="date" id="customExpiryDate" />
+      </div>
+
+      <div class="expiry-preview" id="captureExpiryPreview">
+        <span>🗓️ Scadenza calcolata: <strong id="captureExpiryText">tra 7 giorni</strong></span>
+        <span style="font-size:0.76rem;">Verifica che corrisponda a ciò che vuoi</span>
+      </div>
+
+      <div>
+        <label for="summaryInput">Breve riassunto / Nota</label>
+        <textarea id="summaryInput" placeholder="Breve riassunto o perché l'hai salvato (es. 'Tutorial su come configurare X al minuto 4:20')..."></textarea>
+      </div>
+
+      <div class="dropzone" id="dropzone">
+        📸 Trascina uno screenshot qui, clicca per selezionarlo, oppure premi <strong>Ctrl+V / Cmd+V</strong> ovunque nella pagina
+        <input type="file" id="imageInput" accept="image/*" style="display:none" />
+      </div>
+
+      <div class="preview-box" id="imagePreviewBox">
+        <img id="imagePreviewImg" src="" alt="Anteprima screenshot" />
+        <div style="flex:1; font-size:0.85rem;">Screenshot pronto per il salvataggio</div>
+        <button type="button" id="removeImageBtn" class="danger">Rimuovi</button>
+      </div>
+
+      <!-- Avviso Doppione -->
+      <div class="alert-box alert-dup" id="dupAlertBox">
+        <div id="dupAlertText"></div>
+        <div class="alert-actions">
+          <button type="button" class="warn" id="confirmDupSaveBtn">Salva comunque</button>
+          <button type="button" id="cancelDupSaveBtn">Annulla</button>
+        </div>
+      </div>
+
+      <!-- Verifica Scadenza Diversa / Personalizzata -->
+      <div class="alert-box alert-exp" id="expVerifyBox">
+        <div id="expVerifyText"></div>
+        <div class="alert-actions">
+          <button type="button" class="primary" id="confirmExpSaveBtn">Conferma scadenza e salva</button>
+          <button type="button" id="adjustExpBtn">Cambia scadenza</button>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end;">
+        <button type="submit" class="primary">💾 Salva in Coda</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Filtri e Statistiche -->
+  <div class="stats-bar" id="statsBar"></div>
+
+  <div class="filters" id="statusFilters">
+    <button class="chip active" data-status="todo">Da vedere</button>
+    <button class="chip" data-status="expiring">In scadenza (≤48h)</button>
+    <button class="chip" data-status="done">Archiviati / Fatti</button>
+    <button class="chip" data-status="all">Tutti</button>
+  </div>
+
+  <div class="filters" id="sourceFilters">
+    <button class="chip active" data-source="all">Tutte le fonti</button>
+    <button class="chip" data-source="youtube">YouTube</button>
+    <button class="chip" data-source="instagram">Instagram</button>
+    <button class="chip" data-source="pinterest">Pinterest</button>
+    <button class="chip" data-source="screenshot">Screenshot</button>
+    <button class="chip" data-source="web">Web</button>
+  </div>
+
+  <!-- Lista Elementi -->
+  <main class="item-list" id="itemList"></main>
+
+  <!-- Modale Modifica Elemento -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong>✏️ Modifica Elemento</strong>
+        <button id="closeEditBtn">Chiudi</button>
+      </div>
+      <form id="editForm" class="form-grid">
+        <input type="hidden" id="editId" />
+        <div>
+          <label for="editTitle">Titolo</label>
+          <input type="text" id="editTitle" required />
+        </div>
+        <div class="form-row-2">
+          <div>
+            <label for="editChannel">Canale / Autore</label>
+            <input type="text" id="editChannel" />
+          </div>
+          <div>
+            <label for="editSource">Fonte</label>
+            <select id="editSource">
+              <option value="youtube">YouTube</option>
+              <option value="instagram">Instagram / Reel</option>
+              <option value="pinterest">Pinterest</option>
+              <option value="screenshot">Screenshot</option>
+              <option value="web">Web / Altro</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="editUrl">Link</label>
+          <input type="url" id="editUrl" />
+        </div>
+        <div class="form-row-2">
+          <div>
+            <label for="editStatus">Stato</label>
+            <select id="editStatus">
+              <option value="todo">Da vedere</option>
+              <option value="done">Archiviato / Fatto</option>
+            </select>
+          </div>
+          <div>
+            <label for="editExpiryMode">Scadenza</label>
+            <select id="editExpiryMode">
+              <option value="keep">Mantieni attuale</option>
+              <option value="3">Imposta a 3 giorni da oggi</option>
+              <option value="7">Imposta a 7 giorni da oggi</option>
+              <option value="14">Imposta a 14 giorni da oggi</option>
+              <option value="custom">Data specifica...</option>
+              <option value="none">Rimuovi scadenza (nessuna)</option>
+            </select>
+          </div>
+        </div>
+        <div id="editCustomDateWrap" style="display:none;">
+          <label for="editCustomDate">Nuova data di scadenza</label>
+          <input type="date" id="editCustomDate" />
+        </div>
+        <div class="expiry-preview" id="editExpiryCheckBox">
+          <span>🗓️ Nuova scadenza: <strong id="editExpiryPreviewText"></strong></span>
+          <label style="display:inline-flex; align-items:center; gap:6px; margin:0; cursor:pointer; color:var(--text);">
+            <input type="checkbox" id="editExpiryVerified" /> Ho verificato la scadenza
+          </label>
+        </div>
+        <div>
+          <label for="editSummary">Breve riassunto / Nota</label>
+          <textarea id="editSummary"></textarea>
+        </div>
+        <div style="display:flex; justify-content:flex-end; gap:8px;">
+          <button type="button" id="cancelEditBtn">Annulla</button>
+          <button type="submit" class="primary">💾 Salva modifiche</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modale Triage Veloce -->
+  <div class="modal-backdrop" id="triageModal">
+    <div class="modal">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong>⚡ Triage Veloce (<span id="triageCounter">0/0</span>)</strong>
+        <button id="closeTriageBtn">Chiudi</button>
+      </div>
+      <div id="triageContent"></div>
+    </div>
+  </div>
+
+  <!-- Modale Importazione Backup -->
+  <div class="modal-backdrop" id="importModal">
+    <div class="modal">
+      <h3>⬆️ Importa Backup JSON</h3>
+      <p id="importSummaryText" style="font-size:0.9rem; color:var(--muted);"></p>
+      <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end;">
+        <button id="cancelImportBtn">Annulla</button>
+        <button id="mergeImportBtn" class="primary">Unisci (evita duplicati)</button>
+        <button id="replaceImportBtn" class="danger">Sostituisci tutto</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const DB_NAME = 'SvuotaCodaDB';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'items';
+
+    let db = null;
+    let items = [];
+    let currentStatusFilter = 'todo';
+    let currentSourceFilter = 'all';
+    let pendingImageDataUrl = null;
+    let pendingImportItems = null;
+    let triageQueue = [];
+    let triageIndex = 0;
+    let deferredInstallPrompt = null;
+
+    // Stato per doppioni e verifica scadenza
+    let bypassDuplicateCheck = false;
+    let expiryVerifiedForCurrentDraft = false;
+    let lastCheckedExpiryKey = '';
+
+    // --- REGISTRAZIONE SERVICE WORKER & INSTALLAZIONE PWA ---
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      const installBtn = document.getElementById('installAppBtn');
+      if (installBtn) installBtn.style.display = 'inline-flex';
+    });
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const database = e.target.result;
+          if (!database.objectStoreNames.contains(STORE_NAME)) {
+            database.createObjectStore(STORE_NAME, { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = (e) => {
+          db = e.target.result;
+          resolve(db);
+        };
+        req.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    function dbGetAll() {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.getAll();
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    function dbPut(item) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.put(item);
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    function dbDelete(id) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.delete(id);
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    function dbClear() {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+        const req = store.clear();
+        req.onsuccess = () => resolve();
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    function normalizeUrl(rawUrl) {
+      if (!rawUrl) return '';
+      try {
+        const u = new URL(rawUrl.trim());
+        const host = u.hostname.replace(/^www\./, '').toLowerCase();
+        const path = u.pathname.replace(/\/+$/, '');
+        return `${host}${path}${u.search}`.toLowerCase();
+      } catch {
+        return rawUrl.trim().replace(/^https?:\/\/(www\.)?/i, '').replace(/\/+$/, '').toLowerCase();
+      }
+    }
+
+    function findDuplicates(candidateUrl, candidateTitle, excludeId = null) {
+      const normUrl = normalizeUrl(candidateUrl);
+      const normTitle = (candidateTitle || '').trim().toLowerCase();
+
+      return items.filter(item => {
+        if (excludeId && item.id === excludeId) return false;
+        const sameUrl = normUrl && normalizeUrl(item.url) === normUrl;
+        const sameTitle = normTitle && normTitle.length >= 4 && (item.title || '').trim().toLowerCase() === normTitle;
+        return sameUrl || sameTitle;
+      });
+    }
+
+    function computeExpiryTimestamp(modeValue, customDateStr) {
+      if (modeValue === '0' || modeValue === 'none') return null;
+      if (modeValue === 'custom') {
+        if (!customDateStr) return null;
+        const d = new Date(customDateStr + 'T23:59:59');
+        return isNaN(d.getTime()) ? null : d.getTime();
+      }
+      const days = parseInt(modeValue, 10);
+      if (!days || isNaN(days)) return null;
+      return Date.now() + days * 24 * 60 * 60 * 1000;
+    }
+
+    function formatDateItalian(ts) {
+      if (!ts) return 'Nessuna scadenza';
+      return new Date(ts).toLocaleDateString('it-IT', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    }
+
+    function detectSource(url, hasImage) {
+      if (!url && hasImage) return 'screenshot';
+      const lower = (url || '').toLowerCase();
+      if (lower.includes('youtube.com') || lower.includes('youtu.be')) return 'youtube';
+      if (lower.includes('instagram.com')) return 'instagram';
+      if (lower.includes('pinterest.') || lower.includes('pin.it')) return 'pinterest';
+      return 'web';
+    }
+
+    function formatRemaining(expiresAt) {
+      if (!expiresAt) return 'Nessuna scadenza';
+      const diff = expiresAt - Date.now();
+      if (diff <= 0) return 'Scaduto';
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      if (hours < 24) return `Scade tra ${hours}h (${formatDateItalian(expiresAt)})`;
+      const days = Math.ceil(hours / 24);
+      return `Scade tra ${days}g (${formatDateItalian(expiresAt)})`;
+    }
+
+    function isExpiringSoon(item) {
+      if (!item.expiresAt || item.status !== 'todo') return false;
+      return (item.expiresAt - Date.now()) <= 48 * 60 * 60 * 1000;
+    }
+
+    function updateCaptureExpiryUI() {
+      const modeVal = document.getElementById('expirySelect').value;
+      const customWrap = document.getElementById('customExpiryWrap');
+      const customDateVal = document.getElementById('customExpiryDate').value;
+      const previewText = document.getElementById('captureExpiryText');
+
+      customWrap.style.display = modeVal === 'custom' ? 'block' : 'none';
+
+      const ts = computeExpiryTimestamp(modeVal, customDateVal);
+      if (!ts) {
+        previewText.textContent = modeVal === 'custom' && !customDateVal
+          ? 'seleziona una data'
+          : 'nessuna scadenza';
+      } else {
+        previewText.textContent = formatRemaining(ts);
+      }
+
+      const currentKey = `${modeVal}:${customDateVal}`;
+      if (currentKey !== lastCheckedExpiryKey) {
+        lastCheckedExpiryKey = currentKey;
+        expiryVerifiedForCurrentDraft = false;
+        document.getElementById('expVerifyBox').classList.remove('show');
+      }
+    }
+
+    async function tryFetchMetadata(url) {
+      const statusEl = document.getElementById('metaStatus');
+      const titleInput = document.getElementById('titleInput');
+      const channelInput = document.getElementById('channelInput');
+
+      if (!url) return;
+      const source = detectSource(url, false);
+
+      if (source === 'youtube') {
+        statusEl.textContent = 'Recupero info YouTube...';
+        try {
+          const res = await fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.title && !titleInput.value.trim()) titleInput.value = data.title;
+            if (data.author_name && !channelInput.value.trim()) channelInput.value = data.author_name;
+            statusEl.textContent = 'Titolo e canale rilevati ✓';
+            setTimeout(() => { statusEl.textContent = ''; }, 3000);
+            return;
+          }
+        } catch (err) {}
+        statusEl.textContent = 'Compila titolo o riassunto a mano';
+        setTimeout(() => { statusEl.textContent = ''; }, 3000);
+      }
+    }
+
+    function handleImageFile(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        pendingImageDataUrl = e.target.result;
+        document.getElementById('imagePreviewImg').src = pendingImageDataUrl;
+        document.getElementById('imagePreviewBox').style.display = 'flex';
+        if (document.getElementById('sourceSelect').value === 'auto' && !document.getElementById('urlInput').value) {
+          document.getElementById('sourceSelect').value = 'screenshot';
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // --- GESTIONE DATI IN ARRIVO DA CONDIVISIONE ANDROID (Web Share Target) ---
+    async function handleIncomingShare() {
+      const params = new URLSearchParams(window.location.search);
+      const sharedTitle = params.get('title') || '';
+      const sharedText = params.get('text') || '';
+      const sharedUrl = params.get('url') || '';
+      const hasSharedFile = params.get('shared_file') === '1';
+
+      let extractedUrl = sharedUrl.trim();
+      let extraText = sharedText.trim();
+
+      if (!extractedUrl && extraText) {
+        const match = extraText.match(/https?:\/\/[^\s]+/i);
+        if (match) {
+          extractedUrl = match[0];
+          extraText = extraText.replace(match[0], '').trim();
+        }
+      }
+
+      if (extractedUrl) {
+        document.getElementById('urlInput').value = extractedUrl;
+        tryFetchMetadata(extractedUrl);
+      }
+      if (sharedTitle.trim()) {
+        document.getElementById('titleInput').value = sharedTitle.trim();
+      }
+      if (extraText) {
+        document.getElementById('summaryInput').value = extraText;
+      }
+
+      if (hasSharedFile && 'caches' in window) {
+        try {
+          const cache = await caches.open('svuotacoda-share-temp');
+          const res = await cache.match('/shared-image');
+          if (res) {
+            const blob = await res.blob();
+            await cache.delete('/shared-image');
+            const file = new File([blob], 'screenshot-condiviso.png', { type: blob.type || 'image/png' });
+            handleImageFile(file);
+          }
+        } catch (err) {}
+      }
+
+      if (extractedUrl || sharedTitle || extraText || hasSharedFile) {
+        showToast('Contenuto ricevuto dal menu Condividi! Verifica e salva.');
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+
+    function render() {
+      const listEl = document.getElementById('itemList');
+      const statsEl = document.getElementById('statsBar');
+
+      const todoCount = items.filter(i => i.status === 'todo').length;
+      const expiringCount = items.filter(i => isExpiringSoon(i)).length;
+      const doneCount = items.filter(i => i.status === 'done').length;
+
+      statsEl.innerHTML = `
+        <span>📌 Da vedere: <strong>${todoCount}</strong></span>
+        <span>⏳ In scadenza (≤48h): <strong>${expiringCount}</strong></span>
+        <span>✅ Archiviati: <strong>${doneCount}</strong></span>
+      `;
+
+      let filtered = items.slice().sort((a, b) => b.createdAt - a.createdAt);
+
+      if (currentStatusFilter === 'todo') {
+        filtered = filtered.filter(i => i.status === 'todo');
+      } else if (currentStatusFilter === 'expiring') {
+        filtered = filtered.filter(i => isExpiringSoon(i));
+      } else if (currentStatusFilter === 'done') {
+        filtered = filtered.filter(i => i.status === 'done');
+      }
+
+      if (currentSourceFilter !== 'all') {
+        filtered = filtered.filter(i => i.source === currentSourceFilter);
+      }
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="empty-state">Nessun elemento in questa vista. Ottimo lavoro! 🎉</div>`;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(item => {
+        const expText = formatRemaining(item.expiresAt);
+        const expBadge = item.expiresAt
+          ? `<span class="badge ${isExpiringSoon(item) ? 'expiring' : ''}">${expText}</span>`
+          : `<span class="badge pinned">Senza scadenza</span>`;
+
+        return `
+          <article class="item-card">
+            <div class="item-top">
+              <div>
+                <div class="badges" style="margin-bottom:6px;">
+                  <span class="badge ${item.source}">${item.source}</span>
+                  ${expBadge}
+                </div>
+                <div class="item-title">${escapeHtml(item.title || 'Elemento senza titolo')}</div>
+                ${item.channel ? `<div class="item-channel">👤 ${escapeHtml(item.channel)}</div>` : ''}
+              </div>
+            </div>
+
+            ${item.summary ? `<div class="item-summary">${escapeHtml(item.summary)}</div>` : ''}
+            ${item.url ? `<a class="item-url" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">🔗 ${escapeHtml(item.url)}</a>` : ''}
+            ${item.imageData ? `<img class="item-thumb" src="${item.imageData}" alt="Screenshot" />` : ''}
+
+            <div class="item-actions">
+              ${item.url ? `<a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="btn">↗️ Apri</a>` : ''}
+              <button onclick="openEditModal('${item.id}')">✏️ Modifica</button>
+              ${item.status !== 'done' ? `<button class="success" onclick="markDone('${item.id}')">✓ Fatto</button>` : `<button onclick="reopenItem('${item.id}')">↩️ Riapri</button>`}
+              ${item.expiresAt ? `<button class="warn" onclick="keepForever('${item.id}')">★ Tieni</button>` : ''}
+              <button class="danger" onclick="deleteItem('${item.id}')">✕ Scarta</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // --- MODIFICA ELEMENTO ---
+    window.openEditModal = (id) => {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+
+      document.getElementById('editId').value = item.id;
+      document.getElementById('editTitle').value = item.title || '';
+      document.getElementById('editChannel').value = item.channel || '';
+      document.getElementById('editSource').value = item.source || 'web';
+      document.getElementById('editUrl').value = item.url || '';
+      document.getElementById('editStatus').value = item.status || 'todo';
+      document.getElementById('editSummary').value = item.summary || '';
+      document.getElementById('editExpiryMode').value = 'keep';
+      document.getElementById('editCustomDateWrap').style.display = 'none';
+      document.getElementById('editCustomDate').value = '';
+      document.getElementById('editExpiryVerified').checked = true;
+      updateEditExpiryPreview(item.expiresAt);
+
+      document.getElementById('editModal').classList.add('open');
+    };
+
+    function updateEditExpiryPreview(currentItemExpiresAt) {
+      const mode = document.getElementById('editExpiryMode').value;
+      const customWrap = document.getElementById('editCustomDateWrap');
+      const customDate = document.getElementById('editCustomDate').value;
+      const previewEl = document.getElementById('editExpiryPreviewText');
+      const verifiedCb = document.getElementById('editExpiryVerified');
+
+      customWrap.style.display = mode === 'custom' ? 'block' : 'none';
+
+      let nextTs = currentItemExpiresAt;
+      if (mode === 'none') nextTs = null;
+      else if (mode === 'custom') nextTs = computeExpiryTimestamp('custom', customDate);
+      else if (mode !== 'keep') nextTs = computeExpiryTimestamp(mode, '');
+
+      previewEl.textContent = nextTs ? formatRemaining(nextTs) : 'Nessuna scadenza';
+
+      if (mode !== 'keep') {
+        verifiedCb.checked = false;
+      }
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('open');
+    }
+
+    // --- AZIONI RAPIDE ---
+    window.markDone = async (id) => {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+      item.status = 'done';
+      await dbPut(item);
+      render();
+      showToast('Segnato come fatto ✓');
+    };
+
+    window.reopenItem = async (id) => {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+      item.status = 'todo';
+      await dbPut(item);
+      render();
+      showToast('Rimesso in coda');
+    };
+
+    window.keepForever = async (id) => {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+      item.expiresAt = null;
+      await dbPut(item);
+      render();
+      showToast('Scadenza rimossa ★');
+    };
+
+    window.deleteItem = async (id) => {
+      items = items.filter(i => i.id !== id);
+      await dbDelete(id);
+      render();
+      showToast('Elemento scartato');
+    };
+
+    // --- TRIAGE VELOCE ---
+    function openTriage() {
+      triageQueue = items.filter(i => i.status === 'todo');
+      if (triageQueue.length === 0) {
+        showToast('Nessun elemento da smistare!');
+        return;
+      }
+      triageIndex = 0;
+      document.getElementById('triageModal').classList.add('open');
+      renderTriageCard();
+    }
+
+    function renderTriageCard() {
+      const container = document.getElementById('triageContent');
+      const counter = document.getElementById('triageCounter');
+
+      if (triageIndex >= triageQueue.length) {
+        counter.textContent = 'Completato';
+        container.innerHTML = `<p style="text-align:center; padding:20px 0;">Hai passato in rassegna tutta la coda! 🎉</p>`;
+        return;
+      }
+
+      const item = triageQueue[triageIndex];
+      counter.textContent = `${triageIndex + 1} / ${triageQueue.length}`;
+
+      container.innerHTML = `
+        <div class="item-card" style="margin:0;">
+          <div class="badges">
+            <span class="badge ${item.source}">${item.source}</span>
+            <span class="badge">${formatRemaining(item.expiresAt)}</span>
+          </div>
+          <div class="item-title">${escapeHtml(item.title || 'Elemento senza titolo')}</div>
+          ${item.channel ? `<div class="item-channel">👤 ${escapeHtml(item.channel)}</div>` : ''}
+          ${item.summary ? `<div class="item-summary">${escapeHtml(item.summary)}</div>` : ''}
+          ${item.url ? `<a class="item-url" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">🔗 ${escapeHtml(item.url)}</a>` : ''}
+          ${item.imageData ? `<img class="item-thumb" src="${item.imageData}" alt="Screenshot" />` : ''}
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; margin-top:12px;">
+          <button class="danger" onclick="triageAction('delete')">✕ Scarta</button>
+          <button onclick="openEditModal('${item.id}')">✏️ Modifica</button>
+          <button class="warn" onclick="triageAction('keep')">★ Tieni (no scadenza)</button>
+          <button class="success" onclick="triageAction('done')">✓ Fatto</button>
+          <button onclick="triageAction('skip')">Salta →</button>
+        </div>
+      `;
+    }
+
+    window.triageAction = async (action) => {
+      const item = triageQueue[triageIndex];
+      if (!item) return;
+
+      if (action === 'delete') {
+        items = items.filter(i => i.id !== item.id);
+        await dbDelete(item.id);
+      } else if (action === 'done') {
+        item.status = 'done';
+        await dbPut(item);
+      } else if (action === 'keep') {
+        item.expiresAt = null;
+        await dbPut(item);
+      }
+      triageIndex++;
+      render();
+      renderTriageCard();
+    };
+
+    // --- ESPORTA / IMPORTA BACKUP JSON ---
+    function exportBackup() {
+      const payload = {
+        app: 'SvuotaCoda',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        items
+      };
+      const jsonStr = JSON.stringify(payload, null, 2);
+      const sizeMB = (new Blob([jsonStr]).size / (1024 * 1024)).toFixed(2);
+      const imgCount = items.filter(i => !!i.imageData).length;
+
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `svuotacoda-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+
+      if (imgCount > 0) {
+        showToast(`Backup scaricato (${sizeMB} MB, include ${imgCount} immagini)`);
+      } else {
+        showToast(`Backup scaricato (${items.length} elementi)`);
+      }
+    }
+
+    function handleImportFile(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const importedList = Array.isArray(parsed) ? parsed : parsed.items;
+          if (!Array.isArray(importedList)) {
+            showToast('File JSON non valido');
+            return;
+          }
+          pendingImportItems = importedList;
+          document.getElementById('importSummaryText').textContent =
+            `Trovati ${importedList.length} elementi nel backup. Vuoi unirli a quelli attuali o sostituire tutto?`;
+          document.getElementById('importModal').classList.add('open');
+        } catch (err) {
+          showToast('Errore nella lettura del file JSON');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // --- SALVATAGGIO CON CONTROLLO DOPPIONI E SCADENZA ---
+    async function finalizeCaptureSave() {
+      const urlInput = document.getElementById('urlInput');
+      const url = urlInput.value.trim();
+      const title = document.getElementById('titleInput').value.trim();
+      const channel = document.getElementById('channelInput').value.trim();
+      const summary = document.getElementById('summaryInput').value.trim();
+      const selectedSource = document.getElementById('sourceSelect').value;
+      const expiryMode = document.getElementById('expirySelect').value;
+      const customExpiryDate = document.getElementById('customExpiryDate').value;
+
+      const source = selectedSource === 'auto'
+        ? detectSource(url, !!pendingImageDataUrl)
+        : selectedSource;
+
+      const newItem = {
+        id: 'item_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+        url,
+        title: title || url || 'Screenshot salvato',
+        channel,
+        summary,
+        source,
+        imageData: pendingImageDataUrl || null,
+        status: 'todo',
+        createdAt: Date.now(),
+        expiresAt: computeExpiryTimestamp(expiryMode, customExpiryDate)
+      };
+
+      items.push(newItem);
+      await dbPut(newItem);
+
+      document.getElementById('captureForm').reset();
+      pendingImageDataUrl = null;
+      bypassDuplicateCheck = false;
+      expiryVerifiedForCurrentDraft = false;
+      lastCheckedExpiryKey = '';
+      document.getElementById('imagePreviewBox').style.display = 'none';
+      document.getElementById('dupAlertBox').classList.remove('show');
+      document.getElementById('expVerifyBox').classList.remove('show');
+      updateCaptureExpiryUI();
+      render();
+      showToast('Salvato in coda! ✓');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await openDB();
+      items = await dbGetAll();
+      updateCaptureExpiryUI();
+      render();
+      await handleIncomingShare();
+
+      const installBtn = document.getElementById('installAppBtn');
+      if (installBtn) {
+        installBtn.addEventListener('click', async () => {
+          if (!deferredInstallPrompt) return;
+          deferredInstallPrompt.prompt();
+          const { outcome } = await deferredInstallPrompt.userChoice;
+          if (outcome === 'accepted') {
+            installBtn.style.display = 'none';
+          }
+          deferredInstallPrompt = null;
+        });
+      }
+
+      const urlInput = document.getElementById('urlInput');
+      const titleInput = document.getElementById('titleInput');
+      const expirySelect = document.getElementById('expirySelect');
+      const customExpiryDate = document.getElementById('customExpiryDate');
+
+      urlInput.addEventListener('blur', () => tryFetchMetadata(urlInput.value.trim()));
+      urlInput.addEventListener('paste', () => {
+        setTimeout(() => tryFetchMetadata(urlInput.value.trim()), 100);
+      });
+
+      [urlInput, titleInput].forEach(el => {
+        el.addEventListener('input', () => {
+          bypassDuplicateCheck = false;
+          document.getElementById('dupAlertBox').classList.remove('show');
+        });
+      });
+
+      expirySelect.addEventListener('change', updateCaptureExpiryUI);
+      customExpiryDate.addEventListener('change', updateCaptureExpiryUI);
+
+      document.getElementById('confirmDupSaveBtn').addEventListener('click', () => {
+        bypassDuplicateCheck = true;
+        document.getElementById('dupAlertBox').classList.remove('show');
+        document.getElementById('captureForm').requestSubmit();
+      });
+
+      document.getElementById('cancelDupSaveBtn').addEventListener('click', () => {
+        bypassDuplicateCheck = false;
+        document.getElementById('dupAlertBox').classList.remove('show');
+        showToast('Salvataggio doppione annullato');
+      });
+
+      document.getElementById('confirmExpSaveBtn').addEventListener('click', () => {
+        expiryVerifiedForCurrentDraft = true;
+        document.getElementById('expVerifyBox').classList.remove('show');
+        document.getElementById('captureForm').requestSubmit();
+      });
+
+      document.getElementById('adjustExpBtn').addEventListener('click', () => {
+        document.getElementById('expVerifyBox').classList.remove('show');
+        expirySelect.focus();
+      });
+
+      document.getElementById('captureForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const url = urlInput.value.trim();
+        const title = titleInput.value.trim();
+        const expiryMode = expirySelect.value;
+        const customDateVal = customExpiryDate.value;
+
+        if (!url && !title && !pendingImageDataUrl) {
+          showToast('Inserisci almeno un link, un titolo o uno screenshot');
+          return;
+        }
+
+        if (expiryMode === 'custom' && !customDateVal) {
+          showToast('Seleziona una data di scadenza valida');
+          customExpiryDate.focus();
+          return;
+        }
+
+        if (!bypassDuplicateCheck) {
+          const dups = findDuplicates(url, title);
+          if (dups.length > 0) {
+            const first = dups[0];
+            const dupBox = document.getElementById('dupAlertBox');
+            document.getElementById('dupAlertText').innerHTML =
+              `⚠️ <strong>Possibile doppione trovato:</strong> "<em>${escapeHtml(first.title || first.url)}</em>" è già presente in coda (${first.status === 'done' ? 'archiviato' : 'da vedere'}, ${escapeHtml(formatRemaining(first.expiresAt))}).`;
+            dupBox.classList.add('show');
+            return;
+          }
+        }
+
+        const needsExpiryCheck = (expiryMode !== '7') && !expiryVerifiedForCurrentDraft;
+        if (needsExpiryCheck) {
+          const ts = computeExpiryTimestamp(expiryMode, customDateVal);
+          const desc = ts ? formatRemaining(ts) : 'nessuna scadenza';
+          document.getElementById('expVerifyText').innerHTML =
+            `🗓️ <strong>Verifica scadenza:</strong> hai impostato "<strong>${escapeHtml(desc)}</strong>" (diversa dai 7 giorni predefiniti). Confermi questa scadenza?`;
+          document.getElementById('expVerifyBox').classList.add('show');
+          return;
+        }
+
+        await finalizeCaptureSave();
+      });
+
+      document.getElementById('editExpiryMode').addEventListener('change', () => {
+        const id = document.getElementById('editId').value;
+        const orig = items.find(i => i.id === id);
+        updateEditExpiryPreview(orig ? orig.expiresAt : null);
+      });
+      document.getElementById('editCustomDate').addEventListener('change', () => {
+        const id = document.getElementById('editId').value;
+        const orig = items.find(i => i.id === id);
+        updateEditExpiryPreview(orig ? orig.expiresAt : null);
+      });
+
+      document.getElementById('editForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editId').value;
+        const item = items.find(i => i.id === id);
+        if (!item) return;
+
+        const mode = document.getElementById('editExpiryMode').value;
+        const customDate = document.getElementById('editCustomDate').value;
+        const verified = document.getElementById('editExpiryVerified').checked;
+
+        if (mode === 'custom' && !customDate) {
+          showToast('Inserisci la data per la scadenza personalizzata');
+          return;
+        }
+
+        let nextExpiry = item.expiresAt;
+        if (mode === 'none') nextExpiry = null;
+        else if (mode === 'custom') nextExpiry = computeExpiryTimestamp('custom', customDate);
+        else if (mode !== 'keep') nextExpiry = computeExpiryTimestamp(mode, '');
+
+        const expiryChanged = nextExpiry !== item.expiresAt;
+        if (expiryChanged && !verified) {
+          showToast('Spunta "Ho verificato la scadenza" per confermare la nuova data');
+          return;
+        }
+
+        item.title = document.getElementById('editTitle').value.trim() || item.url || 'Elemento senza titolo';
+        item.channel = document.getElementById('editChannel').value.trim();
+        item.source = document.getElementById('editSource').value;
+        item.url = document.getElementById('editUrl').value.trim();
+        item.status = document.getElementById('editStatus').value;
+        item.summary = document.getElementById('editSummary').value.trim();
+        item.expiresAt = nextExpiry;
+
+        await dbPut(item);
+        closeEditModal();
+        render();
+        if (document.getElementById('triageModal').classList.contains('open')) {
+          renderTriageCard();
+        }
+        showToast('Modifiche salvate ✓');
+      });
+
+      document.getElementById('closeEditBtn').addEventListener('click', closeEditModal);
+      document.getElementById('cancelEditBtn').addEventListener('click', closeEditModal);
+
+      const dropzone = document.getElementById('dropzone');
+      const imageInput = document.getElementById('imageInput');
+
+      dropzone.addEventListener('click', () => imageInput.click());
+      imageInput.addEventListener('change', (e) => handleImageFile(e.target.files[0]));
+
+      dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      });
+      dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        if (e.dataTransfer.files[0]) handleImageFile(e.dataTransfer.files[0]);
+      });
+
+      document.addEventListener('paste', (e) => {
+        const clipItems = e.clipboardData && e.clipboardData.items;
+        if (!clipItems) return;
+        for (const item of clipItems) {
+          if (item.type.startsWith('image/')) {
+            handleImageFile(item.getAsFile());
+            showToast('Screenshot incollato dagli appunti!');
+            break;
+          }
+        }
+      });
+
+      document.getElementById('removeImageBtn').addEventListener('click', () => {
+        pendingImageDataUrl = null;
+        imageInput.value = '';
+        document.getElementById('imagePreviewBox').style.display = 'none';
+      });
+
+      document.querySelectorAll('#statusFilters .chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#statusFilters .chip').forEach(c => c.classList.remove('active'));
+          btn.classList.add('active');
+          currentStatusFilter = btn.dataset.status;
+          render();
+        });
+      });
+
+      document.querySelectorAll('#sourceFilters .chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('#sourceFilters .chip').forEach(c => c.classList.remove('active'));
+          btn.classList.add('active');
+          currentSourceFilter = btn.dataset.source;
+          render();
+        });
+      });
+
+      document.getElementById('openTriageBtn').addEventListener('click', openTriage);
+      document.getElementById('closeTriageBtn').addEventListener('click', () => {
+        document.getElementById('triageModal').classList.remove('open');
+      });
+
+      document.getElementById('exportBtn').addEventListener('click', exportBackup);
+      const importInput = document.getElementById('importFileInput');
+      document.getElementById('importTriggerBtn').addEventListener('click', () => importInput.click());
+      importInput.addEventListener('change', (e) => {
+        handleImportFile(e.target.files[0]);
+        importInput.value = '';
+      });
+
+      document.getElementById('cancelImportBtn').addEventListener('click', () => {
+        pendingImportItems = null;
+        document.getElementById('importModal').classList.remove('open');
+      });
+
+      document.getElementById('mergeImportBtn').addEventListener('click', async () => {
+        if (!pendingImportItems) return;
+        const existingIds = new Set(items.map(i => i.id));
+        let added = 0;
+        for (const item of pendingImportItems) {
+          if (item && item.id && !existingIds.has(item.id)) {
+            items.push(item);
+            await dbPut(item);
+            added++;
+          }
+        }
+        pendingImportItems = null;
+        document.getElementById('importModal').classList.remove('open');
+        render();
+        showToast(`Importati ${added} nuovi elementi`);
+      });
+
+      document.getElementById('replaceImportBtn').addEventListener('click', async () => {
+        if (!pendingImportItems) return;
+        await dbClear();
+        items = [];
+        for (const item of pendingImportItems) {
+          if (item && item.id) {
+            items.push(item);
+            await dbPut(item);
+          }
+        }
+        pendingImportItems = null;
+        document.getElementById('importModal').classList.remove('open');
+        render();
+        showToast(`Backup ripristinato (${items.length} elementi)`);
+      });
+    });
+  </script>
+</body>
+</html>
